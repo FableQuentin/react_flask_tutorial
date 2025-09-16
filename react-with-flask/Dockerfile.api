@@ -1,0 +1,37 @@
+# Build the Flask backend
+FROM python:3.12.5-slim
+
+# Install OS package dependencies
+RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
+    apt-get update --fix-missing && apt-get install -y build-essential libssl-dev libffi-dev \
+    python3-dev libpcre3-dev cargo pkg-config curl --no-install-recommends
+    
+# Install uv (ultra-fast installer and resolver)
+RUN pip install --no-cache-dir uv
+
+# Set working directory inside container
+WORKDIR /app
+
+# Copy dependency definition files first for Docker cache reuse
+COPY pyproject.toml uv.lock ./
+
+# Install dependencies based on the 'uv.lock' file
+# --mount=type=cache: faster build by caching downloaded packages during Docker build 
+# --frozen: ensures the build uses exactly locked dependencies
+# --no-dev: skip installing dev dependencies (better for production image)
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev
+    
+# Make uv-installed binaries visible
+ENV PATH="/app/.venv/bin:$PATH"
+
+# Copy rest of your application code
+COPY api/api.py api/wsgi.py api/.flaskenv ./
+COPY deployment/uwsgi/uwsgi.ini ./
+#COPY migrations migrations
+
+# Make the setup script executable
+#RUN chmod a+x setup.sh
+
+# Expose container port to the outside world (uWSGI application server will listen here)
+EXPOSE 5000

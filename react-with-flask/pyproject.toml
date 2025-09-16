@@ -1,0 +1,23 @@
+[project]
+name = "react-with-flask"
+version = "0.1.0"
+description = "Basic repository for dockerized React+Flask app"
+authors = [{ name = "Quentin FABLE", email = "quentin.fable@ganil.fr" }]
+readme = "README.md"
+requires-python = ">=3.12"
+license = ""
+dependencies = [
+    "Flask~=3.1.0",
+    "email_validator~=2.2.0",
+    "Flask-HTTPAuth~=4.8.0",
+    "Flask-Login~=0.6.3",
+    "Flask-Migrate~=4.1.0",
+    "Flask-WTF~=1.2.2",
+    "httpie~=3.2.4",
+    "PySocks~=1.7.1",
+    "python-dotenv~=1.0.1",
+    "uv~=0.7.6",  
+    "uwsgi>=2.0",
+]
+
+[tool.uv]

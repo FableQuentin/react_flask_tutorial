@@ -1,0 +1,29 @@
+services:
+  # Flask backend
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    image: react-flask-app-api
+    container_name: flask-api
+    command: ["uwsgi", "--ini", "uwsgi.ini"]
+    ports:
+      - "5000:5000" #host_port:container_port
+    volumes:
+      - ./data:/app/data # Persist SQLite database at this location
+    environment:
+      - FLASK_ENV=production
+      - DATABASE_URL=sqlite:////app/data/app.db
+      - SECRET_KEY=your_secret_key_here
+    restart: unless-stopped       
+  
+  # React frontend
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    image: react-flask-app-client
+    container_name: react-ui
+    ports:
+      - "3000:80" #host_port:container_port
+    restart: unless-stopped  
